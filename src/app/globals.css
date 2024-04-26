@@ -31,3 +31,11 @@ body {
     text-wrap: balance;
   }
 }
+
+html,
+body {
+  background-color: transparent; /* Set background to transparent */
+  margin: 0;
+  padding: 0;
+  height: 100%; /* Full height */
+}
