@@ -3,16 +3,22 @@
     flex-direction: column;
     align-items: center;
     justify-content: space-evenly;
-    height: 100vh;
-    overflow: auto;
+}
+
+.gridContainer {
+    display: flex;
+    align-items: center;
+    flex-direction: column;
+    margin-top: 1%;
+    margin-bottom: 3%;
 }
 
 .grid {
     display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3x3 grid */
-    /*margin: auto;*/
+    grid-template-columns: repeat(3, 1fr);
     gap: 2%;
     width: 90%;
+    height: 100%;
 }
 
 .gridItem {
@@ -22,15 +28,15 @@
 
 .imageContainer {
     width: 100%;
-    height: auto;
+    height: 100%;
     position: relative;
 }
 
 .imageContainer img {
     width: 100%;
-    height: auto;
+    height: 100%;
     transition: filter 0.3s ease, transform 0.3s ease;
-    border-radius: 10px;
+    border-radius: 40px;
 }
 
 .overlay {
@@ -43,13 +49,9 @@
     align-items: center;
     justify-content: center;
     opacity: 0;
+    mix-blend-mode: screen;
     transition: opacity 0.3s ease, transform 0.3s ease;
     animation: fadeInScale 0.5s ease forwards;
-}
-
-.vision {
-    scale: 1;
-    opacity: 1;
 }
 
 .blurred {
@@ -68,7 +70,6 @@
 }
 
 .gridButton {
-    /*margin: 10px;*/
     padding: 10px 20px;
     font-size: 16px;
     color: #fff;
