@@ -19,12 +19,17 @@ export default function Home() {
 
         newSocket.on('heartbeat', (data) => {
             console.log('Heartbeat from server:', data);
-            newSocket.emit('heartbeat', { beat: 1 }); // Respond back to the server heartbeat
+            newSocket.emit('heartbeat', { beat: 1 });
         });
 
         newSocket.on('disconnect', () => {
             console.log('Disconnected from server');
         });
+
+        newSocket.on('image-ban', (data) => {
+            console.log('Image Ban from server:', data);
+            setSelectedImages(data);
+        })
 
         return () => {
             newSocket.close();
@@ -34,10 +39,13 @@ export default function Home() {
     const handleImageClick = (index) => {
         setSelectedImages(prev => {
             if (prev.includes(index)) {
+                socket.emit('image-ban', prev.filter(i => i !== index));
                 return prev.filter(i => i !== index);
             } else if (prev.length < 3) {
+                socket.emit('image-ban', [...prev, index]);
                 return [...prev, index];
             } else {
+                socket.emit('image-ban', [...prev.slice(1), index]);
                 return [...prev.slice(1), index];
             }
         });
