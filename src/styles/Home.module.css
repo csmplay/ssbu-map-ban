@@ -83,3 +83,7 @@
 .gridButton:hover {
     background-color: #0056b3;
 }
+
+.gridButton:disabled {
+    background-color: #ccc;
+}

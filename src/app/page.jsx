@@ -2,11 +2,34 @@
 
 import Image from 'next/image';
 import styles from '../styles/Home.module.css';
-import {useState} from 'react';
+import {useState, useEffect} from 'react';
+import io from 'socket.io-client';
 
 export default function Home() {
-
+    const [socket, setSocket] = useState(null);
     const [selectedImages, setSelectedImages] = useState([]);
+
+    useEffect(() => {
+        const newSocket = io();
+        setSocket(newSocket);
+
+        newSocket.on('connect', () => {
+            console.log('Connected to server');
+        });
+
+        newSocket.on('heartbeat', (data) => {
+            console.log('Heartbeat from server:', data);
+            newSocket.emit('heartbeat', { beat: 1 }); // Respond back to the server heartbeat
+        });
+
+        newSocket.on('disconnect', () => {
+            console.log('Disconnected from server');
+        });
+
+        return () => {
+            newSocket.close();
+        }
+    }, []);
 
     const handleImageClick = (index) => {
         setSelectedImages(prev => {
@@ -22,7 +45,7 @@ export default function Home() {
 
     return (
         <div className={styles.pageContainer}>
-            <button className={styles.gridButton}>Button Above</button>
+            <button className={styles.gridButton}>Reset</button>
             <div className={styles.gridContainer}>
                 <div className={styles.grid}>
                     {Array.from({length: 9}, (_, index) => (
@@ -50,7 +73,7 @@ export default function Home() {
                     ))}
                 </div>
             </div>
-            <button className={styles.gridButton}>Button Below</button>
+            <button className={styles.gridButton} disabled={selectedImages.length !== 3}>Confirm</button>
         </div>
     );
 }
