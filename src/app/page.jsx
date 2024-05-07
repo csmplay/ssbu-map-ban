@@ -31,6 +31,11 @@ export default function Home() {
             setSelectedImages(data);
         })
 
+        newSocket.on('reset', () => {
+            console.log('Performed reset');
+            setSelectedImages([]);
+        })
+
         return () => {
             newSocket.close();
         }
@@ -51,9 +56,18 @@ export default function Home() {
         });
     };
 
+    const resetButtonClick = () => {
+        setSelectedImages([]);
+        socket.emit('reset');
+    }
+
+    const confirmTurnClick = () => {
+        socket.emit('confirmTurn');
+    }
+
     return (
         <div className={styles.pageContainer}>
-            <button className={styles.gridButton}>Reset</button>
+            <button className={styles.gridButton} onClick={resetButtonClick}>Reset</button>
             <div className={styles.gridContainer}>
                 <div className={styles.grid}>
                     {Array.from({length: 9}, (_, index) => (
@@ -81,7 +95,7 @@ export default function Home() {
                     ))}
                 </div>
             </div>
-            <button className={styles.gridButton} disabled={selectedImages.length !== 3}>Confirm</button>
+            <button className={styles.gridButton} disabled={selectedImages.length !== 3} onClick={() => confirmTurnClick()}>Confirm</button>
         </div>
     );
 }

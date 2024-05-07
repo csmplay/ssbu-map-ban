@@ -42,6 +42,12 @@ app.prepare().then(() => {
             maps = selectedImages;
             socket.broadcast.emit('image-ban', selectedImages);
         })
+
+        socket.on('reset', () => {
+            console.log('Reset all bans');
+            socket.broadcast.emit('reset');
+            maps = [];
+        })
     });
 
     httpServer.listen(3000, (err) => {
