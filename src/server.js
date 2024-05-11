@@ -12,6 +12,7 @@ const httpServer = http.createServer(server);
 const io = new Server(httpServer);
 let bannedMaps = [];
 let pickedMaps = [];
+let shadowMaps = [];
 let states = 0;
 
 app.prepare().then(() => {
@@ -55,6 +56,7 @@ app.prepare().then(() => {
             socket.broadcast.emit('reset');
             bannedMaps = [];
             pickedMaps = [];
+            shadowMaps = [];
             states = 0;
         })
 
@@ -70,6 +72,12 @@ app.prepare().then(() => {
             console.log(socket.client.id, ' picked maps: ', data);
             pickedMaps = data;
             socket.broadcast.emit('pick', data);
+        })
+
+        socket.on('shadow', (data) => {
+            console.log(socket.client.id, 'shadow maps:', data);
+            shadowMaps = data;
+            socket.broadcast.emit('shadow', shadowMaps);
         })
     });
 

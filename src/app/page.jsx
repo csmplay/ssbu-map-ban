@@ -73,7 +73,7 @@ export default function Home() {
             setCanPickLocked(false);
         })
 
-        newSocket.on('shadowMaps', (data) => {
+        newSocket.on('shadow', (data) => {
             console.log('Shadow maps:', data);
             setShadowMaps(data);
         })
@@ -132,6 +132,10 @@ export default function Home() {
     }
 
     const confirmTurnClick = () => {
+        if (state === 1) {
+            setShadowMaps();
+            socket.emit('')
+        }
         socket.emit('turn');
         setIsInteractive(false);
     }
