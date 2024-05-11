@@ -58,6 +58,20 @@
     filter: blur(5px) grayscale(100%);
 }
 
+.picked {
+    box-shadow: 0 0 8px 2px limegreen;
+    animation: pulseGlow 2s infinite ease-in-out;
+}
+
+@keyframes pulseGlow {
+    0%, 100% {
+        box-shadow: 0 0 8px 2px limegreen; /* Less glow */
+    }
+    50% {
+        box-shadow: 0 0 20px 6px limegreen; /* More glow */
+    }
+}
+
 @keyframes fadeInScale {
     from {
         opacity: 0;
@@ -73,7 +87,7 @@
     padding: 10px 20px;
     font-size: 16px;
     color: #fff;
-    background-color: #0070f3;
+    background-color: #800020;
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -81,9 +95,34 @@
 }
 
 .gridButton:hover {
-    background-color: #0056b3;
+    background-color: #BD3644;
 }
 
 .gridButton:disabled {
     background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.pickButton {
+    padding: 10px 20px;
+    font-size: 16px;
+    color: #fff;
+    background-color: #006201;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.pickButton:hover {
+    background-color: #009f02;
+}
+
+.pickButton:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.disabled {
+    pointer-events: none;
 }
