@@ -84,8 +84,7 @@ export default function Home() {
     }, []);
 
     const handleImageClick = (index) => {
-        console.log(state);
-        if (state === 0 || state === 3) {
+        if (state === 0 || state === 4) {
             setSelectedImages(prev => {
                 if (prev.includes(index)) {
                     socket.emit('image-ban', prev.filter(i => i !== index));
@@ -113,9 +112,23 @@ export default function Home() {
                     }
                 })
             }
+        } else if (state === 3) {
+            if (pickedMaps.includes(index)) {
+                setLockedMaps(prev => {
+                    return [...prev, index];
+                })
+            }
         } else {
-            if (!selectedImages.includes(index)) {
-
+            if (!selectedImages.includes(index) && !shadowMaps.includes(index)) {
+                setPickedMaps(prev => {
+                    setShadowMaps(previous => {
+                        socket.emit('shadow', [...previous, prev.filter(i => i !== index).at(0)]);
+                        return [...previous, prev.filter(i => i !== index).at(0)];
+                    });
+                    socket.emit('pick', [index]);
+                    return [index];
+                });
+                socket.emit('turn');
             }
         }
     };
@@ -133,8 +146,14 @@ export default function Home() {
 
     const confirmTurnClick = () => {
         if (state === 1) {
-            setShadowMaps();
-            socket.emit('')
+            const newShadowMaps = [];
+            for (let i = 0; i < 9; i++) {
+                if (!selectedImages.includes(i) && !pickedMaps.includes(i)) {
+                    newShadowMaps.push(i);
+                }
+            }
+            setShadowMaps(newShadowMaps); // Update the state once with all changes
+            socket.emit('shadow', newShadowMaps);
         }
         socket.emit('turn');
         setIsInteractive(false);
@@ -185,7 +204,7 @@ export default function Home() {
                 </div>
             </div>
             <button className={state === 0 ? styles.gridButton : styles.pickButton}
-                    disabled={state === 0 ? (selectedImages.length !== 3 || !isInteractive) :
+                    disabled={state === 0 ? (selectedImages.length !== 3 || !isInteractive || state === 3) :
                         (pickedMaps.length !== 2 || !isInteractive)}
                     onClick={() => confirmTurnClick()}>
                 {state === 0 ? 'Ban' : 'Pick'}

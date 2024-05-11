@@ -25,6 +25,7 @@ app.prepare().then(() => {
         if (bannedMaps.length !== 0) {
             socket.emit('image-ban', bannedMaps);
             socket.emit('pick', pickedMaps);
+            socket.emit('shadow', shadowMaps);
             socket.emit('game');
             socket.emit('stateUpdate', states);
         }
