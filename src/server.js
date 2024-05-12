@@ -50,7 +50,7 @@ app.prepare().then(() => {
             if (states === 0) {
                 socket.broadcast.emit('game');
             }
-        })
+        });
 
         socket.on('reset', () => {
             console.log('Reset all bans');
@@ -59,6 +59,15 @@ app.prepare().then(() => {
             pickedMaps = [];
             shadowMaps = [];
             states = 0;
+        });
+
+        socket.on('newMap', () => {
+            console.log('New Map');
+            socket.broadcast.emit('newMap');
+            bannedMaps = [];
+            pickedMaps = [];
+            shadowMaps = [];
+            states = 4
         })
 
         socket.on('turn', () => {
@@ -67,19 +76,19 @@ app.prepare().then(() => {
             console.log(states, 'sent');
             socket.emit('stateUpdate', states);
             socket.broadcast.emit('turn', states);
-        })
+        });
         
         socket.on('pick', (data) => {
             console.log(socket.client.id, ' picked maps: ', data);
             pickedMaps = data;
             socket.broadcast.emit('pick', data);
-        })
+        });
 
         socket.on('shadow', (data) => {
             console.log(socket.client.id, 'shadow maps:', data);
             shadowMaps = data;
             socket.broadcast.emit('shadow', shadowMaps);
-        })
+        });
     });
 
     httpServer.listen(3000, (err) => {

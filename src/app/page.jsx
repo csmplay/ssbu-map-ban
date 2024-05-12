@@ -25,6 +25,9 @@ export default function Home() {
 
         newSocket.on('heartbeat', () => {
             newSocket.emit('heartbeat');
+            console.log(isInteractive);
+            console.log(state);
+            console.log()
         });
 
         newSocket.on('disconnect', () => {
@@ -51,6 +54,14 @@ export default function Home() {
             setCanPickLocked(true);
             setState(0);
         });
+
+        newSocket.on('newMap', () => {
+            console.log('New Map');
+            setSelectedImages([]);
+            setPickedMaps([]);
+            setShadowMaps([]);
+            setIsInteractive(false);
+        })
 
         newSocket.on('game', () => {
             console.log('Game started');
@@ -113,10 +124,17 @@ export default function Home() {
                 })
             }
         } else if (state === 3) {
-            if (pickedMaps.includes(index)) {
+            if (pickedMaps.includes(index) && !lockedMaps.includes(index)) {
                 setLockedMaps(prev => {
                     return [...prev, index];
                 })
+                socket.emit('turn');
+                setIsInteractive(true);
+                setSelectedImages([]);
+                setPickedMaps([]);
+                setShadowMaps([]);
+                socket.emit('newMap');
+                setState(4);
             }
         } else {
             if (!selectedImages.includes(index) && !shadowMaps.includes(index)) {
@@ -203,11 +221,11 @@ export default function Home() {
                     ))}
                 </div>
             </div>
-            <button className={state === 0 ? styles.gridButton : styles.pickButton}
-                    disabled={state === 0 ? (selectedImages.length !== 3 || !isInteractive || state === 3) :
+            <button className={state === 0 || 4 ? styles.gridButton : styles.pickButton}
+                    disabled={state === 0 || 4 ? (selectedImages.length !== 3 || !isInteractive ) :
                         (pickedMaps.length !== 2 || !isInteractive)}
                     onClick={() => confirmTurnClick()}>
-                {state === 0 ? 'Ban' : 'Pick'}
+                {state === 0 || 4 ? 'Ban' : 'Pick'}
             </button>
         </div>
     );
