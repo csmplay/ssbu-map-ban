@@ -13,22 +13,31 @@ const io = new Server(httpServer);
 let bannedMaps = [];
 let pickedMaps = [];
 let shadowMaps = [];
+let lockedMaps = [];
+let oppLockedMaps = [];
 let states = 0;
+let cnt = 0;
+let frenID = "";
+let playing = false;
 
 app.prepare().then(() => {
     server.get('*', (req, res) => {
         return handle(req, res);
     });
-    console.log('here');
+
     io.on('connection', (socket) => {
         console.log('A user connected');
-        if (bannedMaps.length !== 0) {
+
+        if (playing) {
             socket.emit('image-ban', bannedMaps);
             socket.emit('pick', pickedMaps);
             socket.emit('shadow', shadowMaps);
             socket.emit('game');
+            socket.emit('lock', [lockedMaps, oppLockedMaps]);
+            socket.emit('opp');
             socket.emit('stateUpdate', states);
         }
+
         const heartbeatInterval = setInterval(() => {
             socket.emit('heartbeat');
         }, 10000);
@@ -44,6 +53,7 @@ app.prepare().then(() => {
         });
 
         socket.on('image-ban', (selectedImages) => {
+            playing = true;
             console.log('Updated selection of images:', selectedImages);
             bannedMaps = selectedImages;
             socket.broadcast.emit('image-ban', selectedImages);
@@ -58,7 +68,11 @@ app.prepare().then(() => {
             bannedMaps = [];
             pickedMaps = [];
             shadowMaps = [];
+            lockedMaps = [];
+            oppLockedMaps = [];
             states = 0;
+            cnt = 0;
+            playing = false;
         });
 
         socket.on('newMap', () => {
@@ -68,6 +82,10 @@ app.prepare().then(() => {
             pickedMaps = [];
             shadowMaps = [];
             states = 4
+        })
+
+        socket.on('loop', () => {
+            states = 2;
         })
 
         socket.on('turn', () => {
@@ -88,6 +106,28 @@ app.prepare().then(() => {
             console.log(socket.client.id, 'shadow maps:', data);
             shadowMaps = data;
             socket.broadcast.emit('shadow', shadowMaps);
+        });
+
+        socket.on('lock', (data) => {
+            cnt += 1;
+            if (cnt === 2) {
+                console.log(data);
+                if (lockedMaps.length === 0) {
+                    frenID = socket.client.id;
+                    lockedMaps = data;
+                    socket.broadcast.emit('opp');
+                    socket.broadcast.emit('lock', [lockedMaps, oppLockedMaps]);
+                } else {
+                    if (socket.client.id === frenID) {
+                        lockedMaps = data;
+                    } else {
+                        oppLockedMaps = data;
+                    }
+                    socket.broadcast.emit('lock', [lockedMaps, oppLockedMaps]);
+                }
+                cnt = 0;
+            }
+
         });
     });
 

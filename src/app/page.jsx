@@ -9,11 +9,13 @@ export default function Home() {
     const [socket, setSocket] = useState(null);
     const [selectedImages, setSelectedImages] = useState([]);
     const [pickedMaps, setPickedMaps] = useState([]);
+    const [playMap, setPlayMap] = useState([-1, -1]);
     const [lockedMaps, setLockedMaps] = useState([]);
+    const [oppLockedMaps, setOppLockedMaps] = useState([]);
     const [shadowMaps, setShadowMaps] = useState([]);
     const [isInteractive, setIsInteractive] = useState(true);
     const [state, setState] = useState(0);
-    const [canPickLocked, setCanPickLocked] = useState(true);
+    const [oppState, setOppState] = useState(false);
 
     useEffect(() => {
         const newSocket = io();
@@ -25,9 +27,6 @@ export default function Home() {
 
         newSocket.on('heartbeat', () => {
             newSocket.emit('heartbeat');
-            console.log(isInteractive);
-            console.log(state);
-            console.log()
         });
 
         newSocket.on('disconnect', () => {
@@ -49,10 +48,12 @@ export default function Home() {
             setSelectedImages([]);
             setPickedMaps([]);
             setLockedMaps([]);
+            setOppLockedMaps([]);
             setShadowMaps([]);
             setIsInteractive(true);
-            setCanPickLocked(true);
             setState(0);
+            setPlayMap([-1, -1]);
+            setOppState(false);
         });
 
         newSocket.on('newMap', () => {
@@ -61,6 +62,7 @@ export default function Home() {
             setPickedMaps([]);
             setShadowMaps([]);
             setIsInteractive(false);
+            setPlayMap([-1, -1]);
         })
 
         newSocket.on('game', () => {
@@ -77,17 +79,21 @@ export default function Home() {
         newSocket.on('stateUpdate', (data) => {
             console.log('Received state update');
             setState(data);
-        })
-
-        newSocket.on('win', () => {
-            console.log("Win, can't pick locked");
-            setCanPickLocked(false);
-        })
+        });
 
         newSocket.on('shadow', (data) => {
             console.log('Shadow maps:', data);
             setShadowMaps(data);
-        })
+        });
+
+        newSocket.on('lock', (data) => {
+            setLockedMaps(data[0]);
+            setOppLockedMaps(data[1]);
+        });
+
+        newSocket.on('opp', () => {
+            setOppState(true);
+        });
 
         return () => {
             newSocket.close();
@@ -109,7 +115,7 @@ export default function Home() {
                 }
             });
         } else if (state === 1) {
-            if (!selectedImages.includes(index)) {
+            if (!selectedImages.includes(index) && !lockedMaps.includes(index)) {
                 setPickedMaps(prev => {
                     if (prev.includes(index)) {
                         socket.emit('pick', prev.filter(i => i !== index));
@@ -124,29 +130,83 @@ export default function Home() {
                 })
             }
         } else if (state === 3) {
-            if (pickedMaps.includes(index) && !lockedMaps.includes(index)) {
-                setLockedMaps(prev => {
-                    return [...prev, index];
-                })
+            if (pickedMaps.includes(index)) {
+                if (!oppState) {
+                    if (!lockedMaps.includes(index)) {
+                        setLockedMaps(prev => {
+                            socket.emit('lock', [...prev, index]);
+                            return [...prev, index];
+                        })
+                    } else {
+                        socket.emit('lock', lockedMaps);
+                    }
+                } else {
+                    if (!oppLockedMaps.includes(index)) {
+                        setOppLockedMaps(prev => {
+                            socket.emit('lock', [...prev, index]);
+                            return [...prev, index];
+                        })
+                    } else {
+                        socket.emit('lock', oppLockedMaps);
+                    }
+                }
+
                 socket.emit('turn');
                 setIsInteractive(true);
                 setSelectedImages([]);
                 setPickedMaps([]);
                 setShadowMaps([]);
                 socket.emit('newMap');
-                setState(4);
             }
-        } else {
+        } else if (state === 2) {
             if (!selectedImages.includes(index) && !shadowMaps.includes(index)) {
-                setPickedMaps(prev => {
-                    setShadowMaps(previous => {
-                        socket.emit('shadow', [...previous, prev.filter(i => i !== index).at(0)]);
-                        return [...previous, prev.filter(i => i !== index).at(0)];
+                if (playMap[0] !== index) {
+                    setPickedMaps(prev => {
+                        setShadowMaps(previous => {
+                            setPlayMap([index, prev.filter(i => i !== index).at(0)])
+                            socket.emit('shadow', [...previous, prev.filter(i => i !== index).at(0)]);
+                            return [...previous, prev.filter(i => i !== index).at(0)];
+                        });
+                        socket.emit('pick', [index]);
+                        return [index];
                     });
-                    socket.emit('pick', [index]);
-                    return [index];
-                });
-                socket.emit('turn');
+                    setPlayMap(index);
+                } else {
+                    setPickedMaps(playMap);
+                    const newShadowMaps = [];
+                    for (let i = 0; i < 9; i++) {
+                        if (!selectedImages.includes(i) && !playMap.includes(i)) {
+                            newShadowMaps.push(i);
+                        }
+                    }
+                    socket.emit('pick', playMap);
+                    setShadowMaps(newShadowMaps);
+                    socket.emit('shadow', newShadowMaps);
+                    setPlayMap([-1, -1]);
+                }
+            }
+        } else if (state === 5) {
+            if (!selectedImages.includes(index) && !shadowMaps.includes(index)) {
+                if ((!lockedMaps.includes(index) && !oppState) ||
+                    (!oppLockedMaps.includes(index) && oppState)) {
+                    if (!pickedMaps.includes(index)) {
+                        setPickedMaps([index]);
+                        socket.emit('pick', [index]);
+                        const newShadowMaps = [];
+                        for (let i = 0; i < 9; i++) {
+                            if (!selectedImages.includes(i) && i !== index) {
+                                newShadowMaps.push(i);
+                            }
+                        }
+                        setShadowMaps(newShadowMaps);
+                        socket.emit('shadow', newShadowMaps);
+                    } else {
+                        setPickedMaps([]);
+                        socket.emit('pick', []);
+                        setShadowMaps([]);
+                        socket.emit('shadow', []);
+                    }
+                }
             }
         }
     };
@@ -155,11 +215,13 @@ export default function Home() {
         setSelectedImages([]);
         setPickedMaps([]);
         setLockedMaps([]);
+        setOppLockedMaps([]);
         setShadowMaps([]);
         setIsInteractive(true);
-        setCanPickLocked(true);
         setState(0);
+        setOppState(false);
         socket.emit('reset');
+        setPlayMap([-1, -1]);
     }
 
     const confirmTurnClick = () => {
@@ -170,11 +232,20 @@ export default function Home() {
                     newShadowMaps.push(i);
                 }
             }
-            setShadowMaps(newShadowMaps); // Update the state once with all changes
+            setShadowMaps(newShadowMaps);
             socket.emit('shadow', newShadowMaps);
+            socket.emit('turn');
+            setIsInteractive(false);
+        } else if (state === 5) {
+            socket.emit('loop');
+            socket.emit('turn');
+        } else if (state === 2) {
+            socket.emit('turn');
         }
-        socket.emit('turn');
-        setIsInteractive(false);
+        else {
+            socket.emit('turn');
+            setIsInteractive(false);
+        }
     }
 
     return (
@@ -208,8 +279,22 @@ export default function Home() {
                                 )}
 
                                 {lockedMaps.includes(index) && (
-                                    <div className={`${styles.overlay}`}>
-                                        <Image src={'/icons/lock.png'} alt={'banned'}
+                                    <div className={`${styles.overlay} 
+                                    ${styles.noBlend} 
+                                    ${shadowMaps.includes(index) ? styles.blurred : ''}`}>
+                                        <Image src={'/icons/lock-new.png'} alt={'locked'}
+                                               width={720}
+                                               height={480}
+                                               draggable={"false"}
+                                        />
+                                    </div>
+                                )}
+
+                                {oppLockedMaps.includes(index) && (
+                                    <div className={`${styles.overlay} 
+                                    ${styles.noBlend} 
+                                    ${shadowMaps.includes(index) ? styles.blurred : ''}`}>
+                                        <Image src={'/icons/lock-opp.png'} alt={'locked-opp'}
                                                width={720}
                                                height={480}
                                                draggable={"false"}
@@ -221,11 +306,13 @@ export default function Home() {
                     ))}
                 </div>
             </div>
-            <button className={state === 0 || 4 ? styles.gridButton : styles.pickButton}
-                    disabled={state === 0 || 4 ? (selectedImages.length !== 3 || !isInteractive ) :
-                        (pickedMaps.length !== 2 || !isInteractive)}
+            <button className={state === 0 || state === 4 ? styles.gridButton : styles.pickButton}
+                    disabled={state === 0 || state === 4 ? (selectedImages.length !== 3 || !isInteractive) :
+                        state === 1 ? (pickedMaps.length !== 2 || !isInteractive) :
+                            state === 3 ? true :
+                                (pickedMaps.length !== 1 || !isInteractive)}
                     onClick={() => confirmTurnClick()}>
-                {state === 0 || 4 ? 'Ban' : 'Pick'}
+                {state === 0 || state === 4 ? 'Ban' : state === 1 ? 'Pick' : 'Play'}
             </button>
         </div>
     );
