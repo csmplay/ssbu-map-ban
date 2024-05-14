@@ -16,7 +16,6 @@ let shadowMaps = [];
 let lockedMaps = [];
 let oppLockedMaps = [];
 let states = 0;
-let cnt = 0;
 let frenID = "";
 let playing = false;
 
@@ -73,7 +72,6 @@ app.prepare().then(() => {
             lockedMaps = [];
             oppLockedMaps = [];
             states = 0;
-            cnt = 0;
             playing = false;
         });
 
@@ -111,8 +109,6 @@ app.prepare().then(() => {
         });
 
         socket.on('lock', (data) => {
-            cnt += 1;
-            if (cnt === 2) {
                 console.log(data);
                 if (lockedMaps.length === 0) {
                     frenID = socket.client.id;
@@ -128,8 +124,6 @@ app.prepare().then(() => {
                     socket.broadcast.emit('lock', [lockedMaps, oppLockedMaps]);
                 }
                 cnt = 0;
-            }
-
         });
     });
 
