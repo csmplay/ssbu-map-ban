@@ -256,7 +256,7 @@ export default function Home() {
                     {Array.from({length: 9}, (_, index) => (
                         <div key={index} className={`${styles.gridItem}`} onClick={isInteractive ? () => handleImageClick(index) : undefined}>
                             <div className={styles.imageContainer}>
-                                <Image
+                                <img
                                     src={`/maps/image${index + 1}.jpg`}
                                     alt={`Image ${index + 1}`}
                                     width={720}
@@ -270,7 +270,7 @@ export default function Home() {
 
                                 <div className={`${styles.overlay}
                                    ${selectedImages.includes(index) ? styles.crossAnimation : ''}`}>
-                                        <Image src={'/icons/ban.png'} alt={'banned'}
+                                        <img src={'/icons/ban.png'} alt={'banned'}
                                                width={720}
                                                height={480}
                                                draggable={"false"}
@@ -281,7 +281,7 @@ export default function Home() {
                                     ${styles.noBlend} 
                                     ${lockedMaps.includes(index) ? styles.crossAnimation : ''}
                                     ${shadowMaps.includes(index) ? styles.blurred : ''}`}>
-                                        <Image src={'/icons/lock-new.png'} alt={'locked'}
+                                        <img src={'/icons/lock-new.png'} alt={'locked'}
                                                width={720}
                                                height={480}
                                                draggable={"false"}
@@ -292,7 +292,7 @@ export default function Home() {
                                     ${oppLockedMaps.includes(index) ? styles.crossAnimation : ''}
                                     ${styles.noBlend} 
                                     ${shadowMaps.includes(index) ? styles.blurred : ''}`}>
-                                        <Image src={'/icons/lock-opp.png'} alt={'locked-opp'}
+                                        <img src={'/icons/lock-opp.png'} alt={'locked-opp'}
                                                width={720}
                                                height={480}
                                                draggable={"false"}
