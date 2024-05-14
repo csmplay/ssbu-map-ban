@@ -94,8 +94,7 @@
 .gridButton {
     padding: 10px 20px;
     font-size: 16px;
-    margin-left: 50%;
-    margin-right: 50%;
+    margin-left: 45%;
     color: #fff;
     background-color: #800020;
     border: none;
@@ -118,8 +117,7 @@
     padding: 10px 20px;
     font-size: 16px;
     color: #fff;
-    margin-left: 50%;
-    margin-right: 50%;
+    margin-left: 45%;
     background-color: #006201;
     border: none;
     border-radius: 5px;
