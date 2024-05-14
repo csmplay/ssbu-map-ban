@@ -53,12 +53,15 @@
     opacity: 0;
     mix-blend-mode: screen;
     transition: opacity 0.3s ease, transform 0.3s ease;
-    animation: fadeInScale 0.5s ease forwards;
 }
 
 .noBlend {
     mix-blend-mode: normal;
     filter: drop-shadow(0px 0px 5px #ffffff);
+}
+
+.crossAnimation {
+    animation: fadeInScale 0.5s ease forwards;
 }
 
 .blurred {

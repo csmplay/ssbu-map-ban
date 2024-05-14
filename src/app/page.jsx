@@ -268,30 +268,28 @@ export default function Home() {
                                     ${shadowMaps.includes(index) ? styles.blurred : ''}`}
                                 />
 
-                                {selectedImages.includes(index) && (
-                                    <div className={`${styles.overlay}`}>
+                                <div className={`${styles.overlay}
+                                   ${selectedImages.includes(index) ? styles.crossAnimation : ''}`}>
                                         <Image src={'/icons/ban.png'} alt={'banned'}
                                                width={720}
                                                height={480}
                                                draggable={"false"}
                                         />
-                                    </div>
-                                )}
+                                </div>
 
-                                {lockedMaps.includes(index) && (
-                                    <div className={`${styles.overlay} 
+                                <div className={`${styles.overlay} 
                                     ${styles.noBlend} 
+                                    ${lockedMaps.includes(index) ? styles.crossAnimation : ''}
                                     ${shadowMaps.includes(index) ? styles.blurred : ''}`}>
                                         <Image src={'/icons/lock-new.png'} alt={'locked'}
                                                width={720}
                                                height={480}
                                                draggable={"false"}
                                         />
-                                    </div>
-                                )}
+                                </div>
 
-                                {oppLockedMaps.includes(index) && (
-                                    <div className={`${styles.overlay} 
+                                <div className={`${styles.overlay} 
+                                    ${oppLockedMaps.includes(index) ? styles.crossAnimation : ''}
                                     ${styles.noBlend} 
                                     ${shadowMaps.includes(index) ? styles.blurred : ''}`}>
                                         <Image src={'/icons/lock-opp.png'} alt={'locked-opp'}
@@ -299,8 +297,7 @@ export default function Home() {
                                                height={480}
                                                draggable={"false"}
                                         />
-                                    </div>
-                                )}
+                                </div>
                             </div>
                         </div>
                     ))}
