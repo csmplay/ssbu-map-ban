@@ -25,6 +25,8 @@ app.prepare().then(() => {
         return handle(req, res);
     });
 
+    server.use(express.static('public'));
+
     io.on('connection', (socket) => {
         console.log('A user connected');
 
