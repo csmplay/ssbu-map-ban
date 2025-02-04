@@ -1,0 +1,9 @@
+services:
+  app:
+    container_name: ssbu-map-ban
+    image: ghcr.io/csmplay/ssbu-map-ban:latest
+    build: .
+    pull_policy: always
+    ports:
+      - "1704:3000"
+    restart: unless-stopped
