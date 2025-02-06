@@ -11,18 +11,18 @@
     "bruh": "node server.js"
   },
   "dependencies": {
+    "@tailwindcss/postcss": "^4.0.0",
     "express": "^4.21.2",
     "next": "15.1.6",
+    "postcss": "^8",
     "react": "^19",
     "react-dom": "^19",
     "sharp": "^0.33.5",
     "socket.io": "^4.8.1",
     "socket.io-client": "^4.8.1",
+    "tailwindcss": "^4.0.0",
     "webpack": "^5.97.1",
-    "webpack-cli": "^6.0.1",
-    "tailwindcss": "^3.3.0",
-    "autoprefixer": "^10.4.20",
-    "postcss": "^8"
+    "webpack-cli": "^6.0.1"
   },
   "devDependencies": {
     "eslint": "^9",

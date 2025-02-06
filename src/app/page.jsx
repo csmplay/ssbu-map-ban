@@ -81,7 +81,7 @@ export default function Home() {
             setState(data);
         });
 
-        newSocket.on('shadow', (data) => {
+        newSocket.on('shadow-sm', (data) => {
             console.log('Shadow maps:', data);
             setShadowMaps(data);
         });
@@ -164,7 +164,7 @@ export default function Home() {
                     setPickedMaps(prev => {
                         setShadowMaps(previous => {
                             setPlayMap([index, prev.filter(i => i !== index).at(0)])
-                            socket.emit('shadow', [...previous, prev.filter(i => i !== index).at(0)]);
+                            socket.emit('shadow-sm', [...previous, prev.filter(i => i !== index).at(0)]);
                             return [...previous, prev.filter(i => i !== index).at(0)];
                         });
                         socket.emit('pick', [index]);
@@ -181,7 +181,7 @@ export default function Home() {
                     }
                     socket.emit('pick', playMap);
                     setShadowMaps(newShadowMaps);
-                    socket.emit('shadow', newShadowMaps);
+                    socket.emit('shadow-sm', newShadowMaps);
                     setPlayMap([-1, -1]);
                 }
             }
@@ -199,12 +199,12 @@ export default function Home() {
                             }
                         }
                         setShadowMaps(newShadowMaps);
-                        socket.emit('shadow', newShadowMaps);
+                        socket.emit('shadow-sm', newShadowMaps);
                     } else {
                         setPickedMaps([]);
                         socket.emit('pick', []);
                         setShadowMaps([]);
-                        socket.emit('shadow', []);
+                        socket.emit('shadow-sm', []);
                     }
                 }
             }
@@ -233,7 +233,7 @@ export default function Home() {
                 }
             }
             setShadowMaps(newShadowMaps);
-            socket.emit('shadow', newShadowMaps);
+            socket.emit('shadow-sm', newShadowMaps);
             socket.emit('turn');
             setIsInteractive(false);
         } else if (state === 5) {
