@@ -1,5 +1,6 @@
 ## This is a remastered version of my Super Smash Bros Ultimate Map Ban app, now on Next.Js and Socket.io :>
 
+
 #### Author: [@goosemooz](https://github.com/goosemooz)
 
 ## Getting Started
