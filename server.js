@@ -20,6 +20,12 @@ let frenID = "";
 let playing = false;
 
 app.prepare().then(() => {
+    server.get('/api/runtime-env', (req, res) => {
+        res.json({
+            NEXT_PUBLIC_CDN_BASE: process.env.NEXT_PUBLIC_CDN_BASE ?? "https://cdn.example.com"
+        });
+    });
+
     server.get(/(.*)/, (req, res) => {
         return handle(req, res);
     });

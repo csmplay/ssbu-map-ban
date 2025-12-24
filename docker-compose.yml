@@ -6,4 +6,6 @@ services:
     pull_policy: always
     ports:
       - "1704:3000"
+    environment:
+      - NEXT_PUBLIC_CDN_BASE=https://cdn.example.com
     restart: unless-stopped

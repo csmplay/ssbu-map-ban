@@ -4,8 +4,11 @@ import Image from 'next/image';
 import styles from '../styles/Home.module.css';
 import {useState, useEffect} from 'react';
 import io from 'socket.io-client';
+import { getMapImageUrl, getIconUrl } from '@/lib/cdn';
+import { useRuntimeEnv } from '@/lib/useRuntimeEnv';
 
 export default function Home() {
+    const { env, isReady } = useRuntimeEnv();
     const [socket, setSocket] = useState(null);
     const [selectedImages, setSelectedImages] = useState([]);
     const [pickedMaps, setPickedMaps] = useState([]);
@@ -250,18 +253,22 @@ export default function Home() {
 
     return (
         <div className={styles.pageContainer}>
-            <button className={styles.gridButton} onClick={resetButtonClick}>Reset</button>
-            <div className={styles.gridContainer}>
-                <div className={styles.grid}>
+            {!isReady && <div>Loading...</div>}
+            {isReady && (
+                <>
+                    <button className={styles.gridButton} onClick={resetButtonClick}>Reset</button>
+                    <div className={styles.gridContainer}>
+                        <div className={styles.grid}>
                     {Array.from({length: 9}, (_, index) => (
                         <div key={index} className={`${styles.gridItem}`} onClick={isInteractive ? () => handleImageClick(index) : undefined}>
                             <div className={styles.imageContainer}>
                                 <Image
-                                    src={`/maps/image${index + 1}.jpg`}
+                                    src={getMapImageUrl(index + 1)}
                                     alt={`Image ${index + 1}`}
                                     width={720}
                                     height={480}
                                     draggable={"false"}
+                                    unoptimized
                                     className={`
                                     ${selectedImages.includes(index) ? styles.blurred : ''} 
                                     ${pickedMaps.includes(index) ? styles.picked : ''} 
@@ -270,21 +277,23 @@ export default function Home() {
 
                                 <div className={`${styles.overlay}
                                    ${selectedImages.includes(index) ? styles.crossAnimation : ''}`}>
-                                        <Image src={'/icons/ban.png'} alt={'banned'}
+                                        <Image src={getIconUrl('ban.png')} alt={'banned'}
                                                width={720}
                                                height={480}
                                                draggable={"false"}
+                                               unoptimized
                                         />
                                 </div>
 
-                                <div className={`${styles.overlay} 
+                                <div className={`${styles.overlay}
                                     ${styles.noBlend} 
                                     ${lockedMaps.includes(index) ? styles.crossAnimation : ''}
                                     ${shadowMaps.includes(index) ? styles.blurred : ''}`}>
-                                        <Image src={'/icons/lock-new.png'} alt={'locked'}
+                                        <Image src={getIconUrl('lock-new.png')} alt={'locked'}
                                                width={720}
                                                height={480}
                                                draggable={"false"}
+                                               unoptimized
                                         />
                                 </div>
 
@@ -292,25 +301,28 @@ export default function Home() {
                                     ${oppLockedMaps.includes(index) ? styles.crossAnimation : ''}
                                     ${styles.noBlend} 
                                     ${shadowMaps.includes(index) ? styles.blurred : ''}`}>
-                                        <Image src={'/icons/lock-opp.png'} alt={'locked-opp'}
+                                        <Image src={getIconUrl('lock-opp.png')} alt={'locked-opp'}
                                                width={720}
                                                height={480}
                                                draggable={"false"}
+                                               unoptimized
                                         />
                                 </div>
                             </div>
                         </div>
                     ))}
-                </div>
-            </div>
-            <button className={state === 0 || state === 4 ? styles.gridButton : styles.pickButton}
-                    disabled={state === 0 || state === 4 ? (selectedImages.length !== 3 || !isInteractive) :
-                        state === 1 ? (pickedMaps.length !== 2 || !isInteractive) :
-                            state === 3 ? true :
-                                (pickedMaps.length !== 1 || !isInteractive)}
-                    onClick={() => confirmTurnClick()}>
-                {state === 0 || state === 4 ? 'Ban' : state === 1 ? 'Pick' : 'Play'}
-            </button>
+                        </div>
+                    </div>
+                    <button className={state === 0 || state === 4 ? styles.gridButton : styles.pickButton}
+                            disabled={state === 0 || state === 4 ? (selectedImages.length !== 3 || !isInteractive) :
+                                state === 1 ? (pickedMaps.length !== 2 || !isInteractive) :
+                                    state === 3 ? true :
+                                        (pickedMaps.length !== 1 || !isInteractive)}
+                            onClick={() => confirmTurnClick()}>
+                        {state === 0 || state === 4 ? 'Ban' : state === 1 ? 'Pick' : 'Play'}
+                    </button>
+                </>
+            )}
         </div>
     );
 }
