@@ -11,7 +11,7 @@
     "bruh": "node server.js"
   },
   "dependencies": {
-    "@tailwindcss/postcss": "^4.1.18",
+    "@tailwindcss/postcss": "^4.2.2",
     "express": "^5.2.1",
     "next": "16.1.1",
     "postcss": "^8",
